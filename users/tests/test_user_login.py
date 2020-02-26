@@ -1,8 +1,9 @@
 from django.urls import reverse
-from django.contrib.auth.models import User
 
 from rest_framework import status
 from rest_framework.test import APITestCase
+
+from users.tests.common import create_user
 
 
 class UserLoginViewTest(APITestCase):
@@ -11,12 +12,9 @@ class UserLoginViewTest(APITestCase):
 
 
     def test_login_user_with_correct_credentials(self):
-        user = User.objects.create_user(
-            username='test',
-            password='test123'
-        )
+        user = create_user()
         data = {
-            'username': 'test',
+            'username': user.username,
             'password': 'test123'
         }
         response = self.client.post(self.base_url, data)
@@ -26,10 +24,7 @@ class UserLoginViewTest(APITestCase):
 
 
     def test_not_login_user_with_invalid_credentials(self):
-        user = User.objects.create_user(
-            username='test',
-            password='test123'
-        )
+        user = create_user()
         data = {
             'username': 'test',
             'password': 'invalid'

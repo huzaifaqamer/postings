@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from users.tests.common import create_user
+
 
 class UserRegisterViewTest(APITestCase):
     def setUp(self):
@@ -105,12 +107,9 @@ class UserRegisterViewTest(APITestCase):
 
 
     def test_not_register_user_if_username_exist(self):
-        User.objects.create_user(
-            username='test',
-            password='test123'
-        )
+        user = create_user()
         data = {
-            'username': 'test',
+            'username': user.username,
             'password': 'secret',
             'retype_password': 'secret'
         }
