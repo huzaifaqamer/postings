@@ -9,7 +9,7 @@ from posts.models import Post
 
 class PostCreateTest(APITestCase):
     def setUp(self):
-        self.base_url = reverse('post-create')
+        self.base_url = reverse('list-create-post')
 
     
     def test_create_post_if_user_logged_in(self):
