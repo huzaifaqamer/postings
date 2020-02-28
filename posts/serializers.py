@@ -25,3 +25,11 @@ class PostSerializer(serializers.ModelSerializer):
         )
 
         return post
+
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.body = validated_data.get('body', instance.body)
+        instance.status = validated_data.get('status', instance.status)
+        instance.save()
+        
+        return instance

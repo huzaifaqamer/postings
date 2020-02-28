@@ -1,9 +1,10 @@
 from django.db.models import Q
 from rest_framework import permissions
-from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 
 from posts.models import Post
 from . import serializers
+from posts.permissions import IsAuthorOrReadOnly
 
 
 class PostView(ListCreateAPIView):
@@ -28,3 +29,19 @@ class PostView(ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+
+class PostRetrieveUpdateView(RetrieveUpdateAPIView):
+
+    permission_classes = (IsAuthorOrReadOnly,)
+
+    def get_queryset(self):
+        posts = Post.objects.filter(
+            Q(status=Post.PostStatus.PUBLISHED) |
+            Q(author_id=self.request.user.id)
+        )
+        return posts
+
+    def get_serializer_class(self):
+        if self.request.method in ('PUT', 'PATCH'):
+            return serializers.PostSerializer

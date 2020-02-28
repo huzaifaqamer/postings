@@ -7,7 +7,7 @@ def create_post(data=None):
         data = {
             'title': 'Test Post',
             'body': 'Test body',
-            'status': Post.PostStatus.Draft,
+            'status': Post.PostStatus.DRAFT,
             'author': user
         }
     
