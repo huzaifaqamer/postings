@@ -28,7 +28,7 @@ class PostCreateTest(APITestCase):
         self.assertEqual(Post.objects.get().author_id, user.pk)
 
 
-    def test_not_create_post_if_user_logged_in(self):
+    def test_not_create_post_if_user_logged_out(self):
         data = {
             'title': 'Test Post',
             'body': 'A test post.',
