@@ -76,4 +76,15 @@ class PostCreateTest(APITestCase):
         self.assertEqual(Post.objects.count(), 1)
         self.assertEqual(Post.objects.get().status, Post.PostStatus.DRAFT)
 
-    
+
+    def test_not_create_post_if_invalid_status(self):
+        data = {
+            'title': 'Test Post',
+            'body': 'A test post.',
+            'status': 'A'
+        }
+        user = create_user()
+        login_user(self.client, user)
+        response = self.client.post(self.base_url, data)
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
