@@ -68,8 +68,8 @@ class PostListTest(APITestCase):
         response = self.client.get(self.base_url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(self.str_to_date(response.data[0].get('created_on')) > self.str_to_date(response.data[1].get('created_on')), True)
-        self.assertEqual(self.str_to_date(response.data[1].get('created_on')) > self.str_to_date(response.data[2].get('created_on')), True)
+        self.assertTrue(self.str_to_date(response.data[0].get('created_on')) > self.str_to_date(response.data[1].get('created_on')))
+        self.assertTrue(self.str_to_date(response.data[1].get('created_on')) > self.str_to_date(response.data[2].get('created_on')))
 
 
     def test_post_has_only_specific_fields(self):
@@ -81,5 +81,5 @@ class PostListTest(APITestCase):
             key_checks.append(key in valid_keys)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(all(key_checks), True)
+        self.assertTrue(all(key_checks))
     
