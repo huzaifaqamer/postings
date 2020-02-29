@@ -22,3 +22,15 @@ class Post(models.Model):
         User,
         on_delete=models.CASCADE
     )
+
+    @property
+    def view_count(self):
+        return self.postviews.views
+
+
+class PostViews(models.Model):
+    post = models.OneToOneField(
+        Post,
+        on_delete=models.CASCADE
+    )
+    views = models.IntegerField(default=0)

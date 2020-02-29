@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from posts.models import Post
+from posts.models import Post, PostViews
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -24,6 +24,9 @@ class PostSerializer(serializers.ModelSerializer):
             author=validated_data.get('author')
         )
 
+        # create postViews instance
+        PostViews.objects.create(post=post)
+
         return post
 
     def update(self, instance, validated_data):
@@ -31,5 +34,14 @@ class PostSerializer(serializers.ModelSerializer):
         instance.body = validated_data.get('body', instance.body)
         instance.status = validated_data.get('status', instance.status)
         instance.save()
-        
+
         return instance
+
+
+class PostDetailSerializer(serializers.ModelSerializer):
+    views = serializers.IntegerField(source='view_count')
+    author = serializers.CharField(source='author.username')
+
+    class Meta:
+        model = Post
+        exclude = ('id',)

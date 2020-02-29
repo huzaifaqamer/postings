@@ -1,5 +1,6 @@
 from django.db.models import Q
 from rest_framework import permissions
+from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 
 from posts.models import Post
@@ -43,5 +44,16 @@ class PostRetrieveUpdateView(RetrieveUpdateAPIView):
         return posts
 
     def get_serializer_class(self):
-        if self.request.method in ('PUT', 'PATCH'):
+        if self.request.method == 'GET':
+            return serializers.PostDetailSerializer
+        elif self.request.method in ('PUT', 'PATCH'):
             return serializers.PostSerializer
+
+    # increment view count
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if request.user != instance.author:
+            instance.postviews.views += 1
+            instance.postviews.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
