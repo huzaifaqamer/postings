@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from users.tests.common import create_user, login_user
-from posts.models import Post
+from posts.models import Post, PostViews
 
 
 class PostCreateTest(APITestCase):
@@ -88,3 +88,23 @@ class PostCreateTest(APITestCase):
         response = self.client.post(self.base_url, data)
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+    def test_new_post_creates_related_post_view(self):
+        data = {
+            'title': 'Test Post',
+            'body': 'A test post.',
+            'status': 'D'
+        }
+        user = create_user()
+        login_user(self.client, user)
+        response = self.client.post(self.base_url, data)
+
+        post = Post.objects.get()
+        post_views = PostViews.objects.get()
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Post.objects.count(), 1)
+        self.assertEqual(PostViews.objects.count(), 1)
+        self.assertTrue(hasattr(post, 'postviews'))
+        self.assertEqual(post.postviews.pk, post_views.pk)
+        self.assertEqual(post_views.views, 0)
