@@ -1,4 +1,4 @@
-from posts.models import Post
+from posts.models import Post, PostViews
 from users.tests.common import create_user
 
 def create_post(data=None):
@@ -12,4 +12,10 @@ def create_post(data=None):
         }
     
     post = Post.objects.create(**data)
+    return post
+
+
+def create_post_with_views(data=None):
+    post = create_post(data)
+    PostViews.objects.create(post=post)
     return post
