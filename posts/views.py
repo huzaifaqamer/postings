@@ -1,16 +1,20 @@
-from django.db.models import Q
 from rest_framework import permissions
 from rest_framework.response import Response
+from rest_framework.filters import OrderingFilter
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView
 
 from posts.models import Post
 from . import serializers
 from posts.permissions import IsAuthorOrReadOnly
+from posts.filters import IsViewablePostFilterBackend
 
 
 class PostView(ListCreateAPIView):
 
+    queryset = Post.objects.all()
     serializer_class = serializers.PostSerializer
+    filter_backends = (IsViewablePostFilterBackend, OrderingFilter)
+    ordering = ['-created_on']
 
     def get_permissions(self):
         # decide permission based on type of request
@@ -21,27 +25,15 @@ class PostView(ListCreateAPIView):
 
         return super().get_permissions()
 
-    def get_queryset(self):
-        posts = Post.objects.filter(
-            Q(status=Post.PostStatus.PUBLISHED) |
-            Q(author_id=self.request.user.id)
-        )
-        return posts.order_by('-created_on')
-
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
 
 class PostRetrieveUpdateView(RetrieveUpdateAPIView):
 
+    queryset = Post.objects.all()
     permission_classes = (IsAuthorOrReadOnly,)
-
-    def get_queryset(self):
-        posts = Post.objects.filter(
-            Q(status=Post.PostStatus.PUBLISHED) |
-            Q(author_id=self.request.user.id)
-        )
-        return posts
+    filter_backends = (IsViewablePostFilterBackend,)
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
